@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? 
+  access_token             String? 
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? 
+  session_state            String?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refresh_token_expires_in Int?
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  items         Item[]         @relation("UserItems")
+  transactions  Transaction[]
+  company       Company?       @relation("UserCompany")
+  locations     Location[]     @relation("UserLocations")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Item {
+  id           Int             @id @default(autoincrement())
+  itemNumber   String          @unique
+  UOM          String
+  price        Float
+  cost         Float
+  description  String
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  itemName     String
+  userId       String
+  quantity     Int             @default(0)
+  leadTime     Int?
+  image        String?
+  user         User            @relation("UserItems", fields: [userId], references: [id])
+  stockChanges StockChange[]
+  itemLocations ItemLocation[]
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  description String
+  createdAt   DateTime @default(now())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Company {
+  id                Int               @id @default(autoincrement())
+  name              String
+  address           String
+  phone             String
+  userId            String?           @unique
+  user              User?             @relation("UserCompany", fields: [userId], references: [id])
+  shippingAddresses ShippingAddress[]
+}
+
+model ShippingAddress {
+  id        Int     @id @default(autoincrement())
+  name      String
+  address   String
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Location {
+  id            Int            @id @default(autoincrement())
+  name          String
+  address       String
+  userId        String
+  user          User           @relation("UserLocations", fields: [userId], references: [id])
+  itemLocations ItemLocation[]
+}
+
+model ItemLocation {
+  id         Int      @id @default(autoincrement())
+  itemId     Int
+  locationId Int
+  quantity   Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  item     Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@index([locationId])
+}
+
+model StockChange {
+  id           Int      @id @default(autoincrement())
+  itemId       Int
+  changedAt    DateTime @default(now())
+  oldQuantity  Float    @map("oldPrice")
+  newQuantity  Float    @map("newPrice")
+  item         Item     @relation(fields: [itemId], references: [id])
+  @@index([itemId])
+  @@map("PriceChange")
+}

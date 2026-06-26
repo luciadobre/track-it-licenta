@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #c8eeee;
+  --color-primary-dark: #1b1b1d;
+  --color-primary-light: #d7f6f3;
+
+  --color-secondary-base: #a9a0d6;
+  --color-secondary-light: #2d2d32;
+  --color-secondary-dark: #85848c;
+
+  --color-text-base: #f4f3f1;
+  --color-text-primary: #161617;
+  --color-text-secondary: #9b9aa3;
+
+  --color-main-background-primary: #161617;
+
+  --color-box-background-primary: #202024;
+  --color-box-background-dark: #161617;
+  --color-box-background-light: #2a2a2f;
+  --color-box-background-hover: #34343a;
+
+  --color-boxBackground-primary: #202024;
+  --color-boxBackground-dark: #161617;
+  --color-boxBackground-light: #2a2a2f;
+  --color-boxBackground-hover: #34343a;
+
+  --color-panel: #202024;
+  --color-panel-light: #2a2a2f;
+  --color-border: #34343a;
+  --color-muted: #9b9aa3;
+  --color-accent: #c8eeee;
+
+  --color-success-base: #9ec8aa;
+  --color-success-light: #c7e6ce;
+  --color-success-dark: #7ead8b;
+
+  --color-fail-base: #e39b9b;
+  --color-fail-light: #f0b8b8;
+  --color-fail-dark: #ba7171;
+
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.burger {
+  display: flex;
+  flex-direction: column;
+  width: 36px;
+  cursor: pointer;
+
+  span {
+    background: var(--color-text-base);
+    border-radius: 10px;
+    height: 3px;
+    margin: 3px 0;
+    transition: 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  }
+
+  span:nth-of-type(1) { width: 50%; }
+  span:nth-of-type(2) { width: 100%; }
+  span:nth-of-type(3) { width: 75%; }
+
+  &:hover span:nth-of-type(3) { width: 100%; }
+
+  input[type='checkbox'] { display: none; }
+
+  input[type='checkbox']:checked ~ span:nth-of-type(1) {
+    transform-origin: bottom;
+    transform: rotatez(45deg) translate(3px, -1px);
+  }
+  input[type='checkbox']:checked ~ span:nth-of-type(2) {
+    transform-origin: top;
+    transform: rotatez(-45deg);
+  }
+  input[type='checkbox']:checked ~ span:nth-of-type(3) {
+    transform-origin: bottom;
+    width: 50%;
+    transform: translate(15px, -4px) rotatez(45deg);
+  }
+}
